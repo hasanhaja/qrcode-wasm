@@ -1,0 +1,15 @@
+{
+  "name": "www",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "Hasan Ali",
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "@total-typescript/tsconfig": "^1.0.4",
+    "typescript": "^6.0.3"
+  }
+}
