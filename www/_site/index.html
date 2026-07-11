@@ -2,25 +2,24 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Hello Zig WASM</title>
-    <style>
-      body {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-      }
-    </style>
+    <meta name="viewport" content="width=device-width">
+    <title>QR Code Generator</title>
+    <script src="./main.js" type="module"></script>
+    <link href="main.css" rel="stylesheet">
   </head>
   <body>
     <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
-    <qr-code data="Tash is awesome"></qr-code>
-
-    <script src="./main.js" type="module"></script>
+    <main class="container">
+      <qr-code data="Tash is awesome"></qr-code>
+      <section id="config">
+        <form>
+          <label>
+            <span>Text</span>
+            <input type="text" name="text" id="text" maxlength="17">
+          </label>
+          <button>Generate</button>
+        </form>
+      </section>
+    </main>
   </body>
 </html>

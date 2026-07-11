@@ -1,5 +1,5 @@
 import { generateQR, getQR, alloc, free, memory } from "./core.js";
-const PIXEL_SIZE = 25; // px
+const PIXEL_SIZE = 15; // px
 const PIXEL_COLOR = "#000000";
 const BG_COLOR = "#FFFFFF";
 const SIZE = 21;
