@@ -10,6 +10,6 @@
   "type": "module",
   "devDependencies": {
     "@total-typescript/tsconfig": "^1.0.4",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   }
 }
