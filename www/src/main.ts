@@ -1,21 +1,16 @@
 import { generateQR, getQR, alloc, free, memory } from "./core.js";
-const PIXEL_SIZE = 5; // px
+
+const PIXEL_SIZE = 25; // px
 const PIXEL_COLOR = "#000000";
 const BG_COLOR = "#FFFFFF";
 
 const size = 21;
-// Give the canvas room for all of our cells and a 1px border
-// around each of them.
+
 const canvas = document.getElementById("qrcode") as HTMLCanvasElement;
-canvas.height = (PIXEL_SIZE + 1) * size + 1;
-canvas.width = (PIXEL_SIZE + 1) * size + 1;
+canvas.height = PIXEL_SIZE * size;
+canvas.width = PIXEL_SIZE * size;
 
 const ctx = canvas.getContext("2d")!;
-
-// TODO Simplify because it's a square
-// const getIndex = (row: number, column: number) => {
-//   return row * size + column;
-// };
 
 const wasmString = (text: string) => {
   const bytes = new TextEncoder().encode(text);
@@ -31,6 +26,7 @@ const wasmString = (text: string) => {
 export const drawCells = (text: string) => {
   const { ptr, len } = wasmString(text);
   const qrcode = generateQR(ptr, len);
+
   ctx.beginPath();
 
   for (let row = 0; row < size; row++) {
@@ -40,15 +36,15 @@ export const drawCells = (text: string) => {
         : BG_COLOR;
 
       ctx.fillRect(
-        col * (PIXEL_SIZE + 1) + 1,
-        row * (PIXEL_SIZE + 1) + 1,
+        col * PIXEL_SIZE,
+        row * PIXEL_SIZE,
         PIXEL_SIZE,
         PIXEL_SIZE
       );
     }
   }
 
-  ctx.stroke();
+  free(ptr, len);
 };
 
-drawCells("Hello world");
+drawCells("WASM is cool");
