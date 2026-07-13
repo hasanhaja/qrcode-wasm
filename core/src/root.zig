@@ -16,6 +16,7 @@
 //! Run with: zig test qr.zig
 
 const std = @import("std");
+const qrcodegen = @import("qrcodegen");
 
 pub const SIZE = 21;
 const N = SIZE * SIZE;
@@ -348,12 +349,12 @@ export fn generateQR(ptr: [*]u8, len: usize) *QrCode {
     return qrcode;
 }
 
-export fn alloc(len: usize) [*]u8 {
+export fn allocString(len: usize) [*]u8 {
     const slice = allocator.alloc(u8, len) catch unreachable;
     return slice.ptr;
 }
 
-export fn free(ptr: [*]u8, len: usize) void {
+export fn freeString(ptr: [*]u8, len: usize) void {
     allocator.free(ptr[0..len]);
 }
 

@@ -12,8 +12,8 @@ type Pointer = number;
 
 export const generateQR = result.instance.exports.generateQR as ((ptr: Pointer, len: number) => Pointer);
 export const getQR = result.instance.exports.get as ((ptr: Pointer, row: number, col: number) => boolean);
-export const alloc = result.instance.exports.alloc as ((len: number) => Pointer);
-export const free = result.instance.exports.free as ((ptr: Pointer, len: number) => void);
+export const alloc = result.instance.exports.allocString as ((len: number) => Pointer);
+export const free = result.instance.exports.freeString as ((ptr: Pointer, len: number) => void);
 
 export const memory = result.instance.exports.memory as WebAssembly.Memory;
 
