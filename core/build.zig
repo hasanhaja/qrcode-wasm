@@ -12,10 +12,20 @@ pub fn build(b: *std.Build) void {
         .preferred_optimize_mode = .ReleaseSmall,
     });
 
+    const qrmod = b.addModule("qr", .{
+        .root_source_file = b.path("vendor/qr/root.zig"),
+    });
+
     const mod = b.addModule("core", .{
         .root_source_file = b.path("src/root.zig"),
         .target = target,
         .optimize = optimize,
+        .imports = &.{
+            .{
+                .name = "qr",
+                .module = qrmod,
+            },
+        },
     });
 
     const wasm_exe = b.addExecutable(.{

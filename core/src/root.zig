@@ -16,7 +16,7 @@
 //! Run with: zig test qr.zig
 
 const std = @import("std");
-const qrcodegen = @import("qrcodegen");
+const qr = @import("qr");
 
 pub const SIZE = 21;
 const N = SIZE * SIZE;
@@ -414,13 +414,13 @@ test "generateQR runs end to end without error" {
 }
 
 test "finder pattern center is dark" {
-    const qr = try generateQR("HI");
-    try std.testing.expect(qr.get(3, 3)); // center of top-left finder
-    try std.testing.expect(qr.get(3, SIZE - 4)); // center of top-right finder
-    try std.testing.expect(qr.get(SIZE - 4, 3)); // center of bottom-left finder
+    const qrcode = try generateQR("HI");
+    try std.testing.expect(qrcode.get(3, 3)); // center of top-left finder
+    try std.testing.expect(qrcode.get(3, SIZE - 4)); // center of top-right finder
+    try std.testing.expect(qrcode.get(SIZE - 4, 3)); // center of bottom-left finder
 }
 
 test "dark module is always on" {
-    const qr = try generateQR("HI");
-    try std.testing.expect(qr.get(SIZE - 8, 8));
+    const qrcode = try generateQR("HI");
+    try std.testing.expect(qrcode.get(SIZE - 8, 8));
 }
