@@ -24,7 +24,7 @@ pub const MAX_TEXT_LEN = 17;
 
 pub const EncodeError = error{TextTooLong};
 
-var allocator = std.heap.wasm_allocator;
+var allocator = std.heap.page_allocator;
 
 fn idx(row: usize, col: usize) usize {
     return row * SIZE + col;

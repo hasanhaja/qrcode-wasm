@@ -1,5 +1,7 @@
 # Vendor
 
-## qrcodegen
+## qr
 
- Source: https://github.com/nayuki/QR-Code-generator/tree/master
+ Source: https://github.com/hasanhaja/qr
+
+ This was forked from https://github.com/bensengupta/qr
