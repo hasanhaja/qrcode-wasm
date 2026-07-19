@@ -27,7 +27,6 @@ export class QrCode extends HTMLElement {
   private canvas: HTMLCanvasElement | null = null;
 
   private qrcodeData: string = "QRCode";
-  private size: number = 0;
 
   static css = `
     :host {
