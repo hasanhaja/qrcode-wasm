@@ -1,4 +1,4 @@
-import { generateQR, getQR, alloc, free, memory, getSizeQR } from "./core.js";
+import { generateQR, getQR, alloc, free, memory, getSizeQR, destroyQR } from "./core.js";
 const PIXEL_SIZE = 15; // px
 const PIXEL_COLOR = "#000000";
 const BG_COLOR = "#FFFFFF";
@@ -75,6 +75,7 @@ export class QrCode extends HTMLElement {
                 ctx.fillRect(col * PIXEL_SIZE, row * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
             }
         }
+        destroyQR(qrcode);
         free(ptr, len);
     }
     attributeChangedCallback(name, oldValue, newValue) {

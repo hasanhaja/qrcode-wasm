@@ -1,4 +1,4 @@
-import { generateQR, getQR, alloc, free, memory, getSizeQR } from "./core.js";
+import { generateQR, getQR, alloc, free, memory, getSizeQR, destroyQR } from "./core.js";
 
 const PIXEL_SIZE = 15; // px
 const PIXEL_COLOR = "#000000";
@@ -81,7 +81,6 @@ export class QrCode extends HTMLElement {
     const qrcode = generateQR(ptr, len);
 
     const SIZE = getSizeQR(qrcode);
-    console.log("DEBUG: Size =", SIZE);
 
     this.canvas.height = PIXEL_SIZE * SIZE;
     this.canvas.width = PIXEL_SIZE * SIZE;
@@ -103,6 +102,7 @@ export class QrCode extends HTMLElement {
       }
     }
 
+    destroyQR(qrcode);
     free(ptr, len);
   }
 

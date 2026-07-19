@@ -17,7 +17,6 @@ For compilation and execution:
 - Zig 0.16.0
 - Node.js v25
 
-
 TODO Replace section with `Makefile` scripts
 
 Executing the `run.sh` script does the following:
