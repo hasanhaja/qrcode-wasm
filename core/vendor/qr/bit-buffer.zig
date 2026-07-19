@@ -7,17 +7,19 @@ pub const BitBuffer = struct {
     const Self = @This();
 
     arrayList: std.ArrayList(u1),
+    allocator: Allocator,
 
     pub fn init(allocator: Allocator) Self {
-        const arrayList = std.ArrayList(u1).init(allocator);
+        const arrayList: std.ArrayList(u1) = .empty;
 
         return Self{
             .arrayList = arrayList,
+            .allocator = allocator,
         };
     }
 
-    pub fn deinit(self: Self) void {
-        self.arrayList.deinit();
+    pub fn deinit(self: *Self) void {
+        self.arrayList.deinit(self.allocator);
     }
 
     pub fn get(self: Self, index: usize) u1 {
@@ -33,7 +35,7 @@ pub const BitBuffer = struct {
         const numBits = @bitSizeOf(T);
 
         if (numBits == 1) {
-            try self.arrayList.append(val);
+            try self.arrayList.append(self.allocator, val);
             return;
         }
 
@@ -41,7 +43,7 @@ pub const BitBuffer = struct {
         for (0..numBits) |_| {
             // Push the leftmost bit
             const leftmostBit: u1 = @intCast(val / leftmostBitMask);
-            try self.arrayList.append(leftmostBit);
+            try self.arrayList.append(self.allocator, leftmostBit);
             val = (val % leftmostBitMask) << 1;
         }
     }
@@ -57,14 +59,14 @@ pub const BitBuffer = struct {
 
         for (0..numBits) |_| {
             const bit: u1 = @intCast(reversed & 1);
-            try self.arrayList.append(bit);
+            try self.arrayList.append(self.allocator, bit);
             reversed >>= 1;
         }
     }
 
     pub fn extend(self: *Self, otherBuffer: BitBuffer) !void {
         for (0..otherBuffer.getLength()) |i| {
-            try self.arrayList.append(otherBuffer.get(i));
+            try self.arrayList.append(self.allocator, otherBuffer.get(i));
         }
     }
 

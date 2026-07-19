@@ -1,10 +1,8 @@
-import { generateQR, getQR, alloc, free, memory } from "./core.js";
+import { generateQR, getQR, alloc, free, memory, getSizeQR } from "./core.js";
 
 const PIXEL_SIZE = 15; // px
 const PIXEL_COLOR = "#000000";
 const BG_COLOR = "#FFFFFF";
-
-const SIZE = 21;
 
 const wasmString = (text: string) => {
   const bytes = new TextEncoder().encode(text);
@@ -29,7 +27,8 @@ export class QrCode extends HTMLElement {
   private canvas: HTMLCanvasElement | null = null;
 
   private qrcodeData: string = "QRCode";
-  
+  private size: number = 0;
+
   static css = `
     :host {
       display: inline-block;
@@ -60,9 +59,6 @@ export class QrCode extends HTMLElement {
   connectedCallback() {
     this.canvas = this.root.getElementById("qrcode") as HTMLCanvasElement;
 
-    this.canvas.height = PIXEL_SIZE * SIZE;
-    this.canvas.width = PIXEL_SIZE * SIZE;
-
     this.render(this.data);
   }
 
@@ -83,6 +79,12 @@ export class QrCode extends HTMLElement {
 
     const { ptr, len } = wasmString(value);
     const qrcode = generateQR(ptr, len);
+
+    const SIZE = getSizeQR(qrcode);
+    console.log("DEBUG: Size =", SIZE);
+
+    this.canvas.height = PIXEL_SIZE * SIZE;
+    this.canvas.width = PIXEL_SIZE * SIZE;
 
     ctx.beginPath();
 

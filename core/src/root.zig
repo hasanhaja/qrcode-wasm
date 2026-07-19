@@ -318,36 +318,42 @@ const QrCode = struct {
     }
 };
 
-export fn generateQR(ptr: [*]u8, len: usize) *QrCode {
-    const text: []const u8 = ptr[0..len];
-    const data_cw = encodeData(text) catch unreachable;
-    const ec_cw = rsEncode(data_cw, 7);
+// export fn generateQR(ptr: [*]u8, len: usize) *QrCode {
+//     const text: []const u8 = ptr[0..len];
+//     const data_cw = encodeData(text) catch unreachable;
+//     const ec_cw = rsEncode(data_cw, 7);
 
-    var codewords: [26]u8 = undefined;
-    @memcpy(codewords[0..19], &data_cw);
-    @memcpy(codewords[19..26], &ec_cw);
+//     var codewords: [26]u8 = undefined;
+//     @memcpy(codewords[0..19], &data_cw);
+//     @memcpy(codewords[19..26], &ec_cw);
 
-    var dark = std.StaticBitSet(N).initEmpty();
-    var is_function = std.StaticBitSet(N).initEmpty();
+//     var dark = std.StaticBitSet(N).initEmpty();
+//     var is_function = std.StaticBitSet(N).initEmpty();
 
-    placeFinder(&dark, &is_function, 0, 0);
-    placeFinder(&dark, &is_function, 0, SIZE - 7);
-    placeFinder(&dark, &is_function, SIZE - 7, 0);
-    placeTiming(&dark, &is_function);
-    reserveFormatAreas(&dark, &is_function);
+//     placeFinder(&dark, &is_function, 0, 0);
+//     placeFinder(&dark, &is_function, 0, SIZE - 7);
+//     placeFinder(&dark, &is_function, SIZE - 7, 0);
+//     placeTiming(&dark, &is_function);
+//     reserveFormatAreas(&dark, &is_function);
 
-    placeData(&dark, &is_function, codewords);
+//     placeData(&dark, &is_function, codewords);
 
-    const format_bits = computeFormatBits(0b01, 0); // EC level L = 01, mask = 0
-    placeFormatBits(&dark, format_bits);
+//     const format_bits = computeFormatBits(0b01, 0); // EC level L = 01, mask = 0
+//     placeFormatBits(&dark, format_bits);
 
-    applyMask(&dark, is_function);
+//     applyMask(&dark, is_function);
 
-    const qrcode = allocator.create(QrCode) catch unreachable;
-    qrcode.* = .{ .dark = dark };
+//     const qrcode = allocator.create(QrCode) catch unreachable;
+//     qrcode.* = .{ .dark = dark };
 
-    return qrcode;
+//     return qrcode;
+// }
+
+export fn generateQR(ptr: [*]u8, len: usize) *qr.QrCode {
+    const code = qr.generateQR(allocator, ptr, len) catch unreachable;
+    return code;
 }
+
 
 export fn allocString(len: usize) [*]u8 {
     const slice = allocator.alloc(u8, len) catch unreachable;

@@ -16,6 +16,10 @@ pub const BitMatrix = struct {
         return Self{ .allocator = allocator, .size = size, .data = data };
     }
 
+    pub fn getSize(self: Self) usize {
+        return self.size;
+    }
+
     pub fn deinit(self: Self) void {
         self.allocator.free(self.data);
     }

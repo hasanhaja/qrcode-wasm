@@ -307,21 +307,23 @@ fn addQuietZone(pixels: *BitMatrix, quietZoneSize: usize) !void {
 
 pub const CreateOptions = struct {
     content: []const u8,
-    ecLevel: ErrorCorrectionLevel = ErrorCorrectionLevel.M,
+    ecLevel: ErrorCorrectionLevel = ErrorCorrectionLevel.Q,
     quietZoneSize: usize = 4,
 };
 
+// TODO I think BitMatrix is equivalent to BitSet from my version, so will need to replace this whole lot
 pub fn create(allocator: Allocator, options: CreateOptions) !BitMatrix {
-    const segments = try Segments.init(allocator, options.content);
+    var segments = try Segments.init(allocator, options.content); // This can stay
     defer segments.deinit();
 
-    const version = try getBestVersion(segments, options.ecLevel);
+    const version = try getBestVersion(segments, options.ecLevel); // This can stay
 
-    const dataBits = try encodeData(allocator, version, segments, options.ecLevel);
+    var dataBits = try encodeData(allocator, version, segments, options.ecLevel); // This can stay
     defer dataBits.deinit();
 
-    const matrixSize = version_info.getMatrixSize(version);
+    const matrixSize = version_info.getMatrixSize(version); // This can stay
 
+    // TODO Replace with DynamicBitSet
     var pixels = try BitMatrix.init(allocator, matrixSize);
 
     const reserved = try BitMatrix.init(allocator, matrixSize);
@@ -345,44 +347,100 @@ pub fn create(allocator: Allocator, options: CreateOptions) !BitMatrix {
     return pixels;
 }
 
-extern fn createQRCodeCallback(matrixPtr: [*]const u8, size: usize) void;
+// const QrCode = struct {
+//     dark: std.StaticBitSet(N),
 
-export fn allocUint8(length: usize) [*]u8 {
-    const slice = std.heap.page_allocator.alloc(u8, length) catch @panic("failed to allocate memory");
+//     export fn get(self: *const QrCode, row: usize, col: usize) bool {
+//         return self.dark.isSet(idx(row, col));
+//     }
+// };
 
-    return slice.ptr;
-}
+// TODO This is a placeholder and needs to be replaced. It feels weird mixing public and export in the vendor lib. This should just be public and not export.
+pub const QrCode = struct {
+    dark: BitMatrix,
 
-export fn freeUint8(slice: [*]const u8, length: usize) void {
-    std.heap.page_allocator.free(slice[0..length]);
-}
-
-export fn createQRCode(messagePtr: [*:0]const u8, ecLevelInt: u8, qzoneSize: usize) void {
-    const allocator = std.heap.page_allocator;
-
-    const message = std.mem.span(messagePtr);
-    const ecLevel: ErrorCorrectionLevel = @enumFromInt(ecLevelInt);
-
-    const options = CreateOptions{
-        .content = message,
-        .quietZoneSize = qzoneSize,
-        .ecLevel = ecLevel,
-    };
-
-    const matrix = create(allocator, options) catch @panic("failed to create QR code");
-    defer matrix.deinit();
-
-    // var buffer = std.heap.page_allocator.alloc(u8, length) catch @panic("failed to allocate memory");
-    var buffer = allocUint8(matrix.size * matrix.size);
-
-    for (0..matrix.size) |r| {
-        for (0..matrix.size) |c| {
-            buffer[r * matrix.size + c] = @intCast(matrix.get(r, c));
-        }
+    export fn get(self: *const QrCode, row: usize, col: usize) bool {
+        return self.dark.get(row, col) == 1;
     }
 
-    createQRCodeCallback(buffer, matrix.size);
+    export fn size(self: *const QrCode) usize {
+        return self.dark.getSize();
+    }
+
+    export fn deinit(self: *const QrCode) void {
+        self.dark.deinit();
+    }
+};
+
+pub fn generateQR(allocator: Allocator, ptr: [*]u8, len: usize) !*QrCode {
+    const text: []const u8 = ptr[0..len];
+
+    const options = CreateOptions{
+        .content = text,
+    };
+
+    const qrcode = try allocator.create(QrCode);
+
+    const matrix = try create(allocator, options);
+    qrcode.* = .{ .dark = matrix };
+
+    // This buffer will be in the shared buffer that the rendering logic can read from. I'm hoping to do the same with what I currently have.
+    // var buffer = std.heap.page_allocator.alloc(u8, length) catch @panic("failed to allocate memory");
+    // var buffer = allocUint8(matrix.size * matrix.size);
+
+    // for (0..matrix.size) |r| {
+    //     for (0..matrix.size) |c| {
+    //         buffer[r * matrix.size + c] = @intCast(matrix.get(r, c));
+    //     }
+    // }
+
+    // createQRCodeCallback(buffer, matrix.size);
+    return qrcode;
 }
+
+// TODO Replace with my own version
+//
+// export fn createQRCode(messagePtr: [*:0]const u8, ecLevelInt: u8, qzoneSize: usize) void {
+//     const allocator = std.heap.page_allocator;
+
+//     const message = std.mem.span(messagePtr);
+//     const ecLevel: ErrorCorrectionLevel = @enumFromInt(ecLevelInt);
+
+//     const options = CreateOptions{
+//         .content = message,
+//         .quietZoneSize = qzoneSize,
+//         .ecLevel = ecLevel,
+//     };
+
+//     // ---------------------------------------------------------------------
+//     // Below this, this is to do with QrCode struct from my implementation |
+//     // ---------------------------------------------------------------------
+//     const matrix = create(allocator, options) catch @panic("failed to create QR code");
+//     defer matrix.deinit();
+
+//     // var buffer = std.heap.page_allocator.alloc(u8, length) catch @panic("failed to allocate memory");
+//     var buffer = allocUint8(matrix.size * matrix.size);
+
+//     for (0..matrix.size) |r| {
+//         for (0..matrix.size) |c| {
+//             buffer[r * matrix.size + c] = @intCast(matrix.get(r, c));
+//         }
+//     }
+
+//     createQRCodeCallback(buffer, matrix.size);
+// }
+
+// TODO Replace with my own implementation
+//
+// export fn allocUint8(length: usize) [*]u8 {
+//     const slice = std.heap.page_allocator.alloc(u8, length) catch @panic("failed to allocate memory");
+
+//     return slice.ptr;
+// }
+
+// export fn freeUint8(slice: [*]const u8, length: usize) void {
+//     std.heap.page_allocator.free(slice[0..length]);
+// }
 
 test "no memory leaks" {
     const allocator = std.testing.allocator;
