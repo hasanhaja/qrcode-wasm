@@ -19,7 +19,6 @@ export class QrCode extends HTMLElement {
     root;
     canvas = null;
     qrcodeData = "QRCode";
-    size = 0;
     static css = `
     :host {
       display: inline-block;
@@ -63,7 +62,6 @@ export class QrCode extends HTMLElement {
         const { ptr, len } = wasmString(value);
         const qrcode = generateQR(ptr, len);
         const SIZE = getSizeQR(qrcode);
-        console.log("DEBUG: Size =", SIZE);
         this.canvas.height = PIXEL_SIZE * SIZE;
         this.canvas.width = PIXEL_SIZE * SIZE;
         ctx.beginPath();

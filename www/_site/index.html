@@ -10,9 +10,20 @@
   <body>
     <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
     <main class="container">
-      <qr-code data="Tash is awesome"></qr-code>
+      <qr-code data="Hello world!"></qr-code>
       <section id="config">
         <form>
+          <fieldset>
+            <legend>Data Type</legend>
+            <div>
+              <input type="radio" id="wifi" name="data-type" value="wifi">
+              <label for="wifi">WiFi</label>
+            </div>
+            <div>
+              <input type="radio" id="url" name="data-type" value="url">
+              <label for="url">URL</label>
+            </div>
+          </fieldset>
           <label>
             <span>Text</span>
             <input type="text" name="text" id="text">
