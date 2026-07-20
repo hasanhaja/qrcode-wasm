@@ -1,4 +1,5 @@
 build:
+	cp www/static/* www/_site; \
 	cd core; zig build; \
 	cd ../www; \
 	npm run build; \
